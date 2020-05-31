@@ -26,7 +26,8 @@ def source_to_target(in_path, in_file, target_wb):
                         bold=cell.font.b,
                         color=cell.font.color)
             alignment = Alignment(horizontal=cell.alignment.horizontal,
-                                  vertical=cell.alignment.vertical)
+                                  vertical=cell.alignment.vertical,
+                                  wrapText=cell.alignment.wrapText)
             target_sheet[cell.coordinate].font = font
             target_sheet[cell.coordinate].alignment = alignment
             target_sheet[cell.coordinate] = cell.value
