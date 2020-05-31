@@ -11,7 +11,7 @@ def remember_cell_size(source_sheet, cell):
 
 
 def source_to_target(in_path, in_file, target_wb):
-    target_wb.create_sheet(title=in_file, index=0)
+    target_wb.create_sheet(title=in_file.split('.')[0], index=0)
 
     source_wb = openpyxl.load_workbook(f'{in_path}/{in_file}')
     source_sheet = source_wb.active
