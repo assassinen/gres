@@ -47,7 +47,6 @@ def main():
     in_path = 'in'
     out_file = 'out/result_book.xlsx'
 
-
     target_wb = openpyxl.Workbook()
 
     for in_file in in_files:

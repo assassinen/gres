@@ -12,21 +12,23 @@ def remember_cell_size(source_sheet, cell, max_row=0):
     return f'{col_index}{int(row_index + max_row)}'
 
 
-def source_to_target(in_path, in_file, target_wb, template_sheets):
+def source_to_target(in_path, in_file, target_wb, template_sheets, skip_row=0):
     source_wb = openpyxl.load_workbook(f'{in_path}/{in_file}')
-
     for sheet in template_sheets:
         try:
             source_sheet = source_wb[sheet]
         except:
             continue
         target_sheet = target_wb[sheet]
-
-        max_row = 0 if in_file == '_template.xlsx' else target_sheet.max_row + 1
+        max_row = 0 if in_file == '_template.xlsx' else target_sheet.max_row
+        counter = -1
 
         for row in source_sheet:
+            counter += 1
+            if counter < skip_row and in_file != '_template.xlsx':
+                continue
             for cell in row:
-                coordinate = remember_cell_size(source_sheet, cell.coordinate, max_row)
+                coordinate = remember_cell_size(source_sheet, cell.coordinate, max_row-skip_row)
                 font = Font(name=cell.font.name,
                             size=cell.font.size,
                             italic=cell.font.i,
@@ -47,15 +49,33 @@ def source_to_target(in_path, in_file, target_wb, template_sheets):
                 target_sheet.row_dimensions[name].height = value
 
         for merge_cell in source_sheet.merged_cells:
-            merge = [f'{i[0]}{int(i[1:])+max_row}' for i in str(merge_cell).split(':')]
-            target_sheet.merge_cells(':'.join(merge))
+            merge = [f'{i[0]}{int(i[1:])+max_row-skip_row}' for i in str(merge_cell).split(':')
+                     if int(i[1:])+max_row-skip_row > max_row]
+            if len(merge) > 0:
+                target_sheet.merge_cells(':'.join(merge))
+
+
+def add_formulas(target_wb, template_sheets, cells_with_formulas, height_final_table, skip_row):
+    for sheet in template_sheets:
+        target_sheet = target_wb[sheet]
+        number_items = (target_sheet.max_row - skip_row) // height_final_table
+        for cell in cells_with_formulas:
+            cells = []
+            for number_item in range(1, number_items):
+                cells += [f'{i[0]}{int(i[1:]) + number_item * height_final_table}'
+                          for i in str(cell).split(':')]
+            target_sheet[cell] = '=' + '+'.join(cells)
 
 
 def main():
     in_files = ['tula_book.xlsx', 'orel_book.xlsx']
     in_path = 'in'
     out_file = 'out/result_book.xlsx'
-    skip_row = 3
+    skip_row = 4
+    cells_with_formulas = ['C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5',
+                           'C6', 'D6', 'E6', 'F6', 'G6', 'H6', 'I6', 'J6', 'K6', 'L6', 'M6', 'N6',
+                           'C7', 'D7', 'E7', 'F7']
+    height_final_table = 3
 
     template_wb = openpyxl.load_workbook(f'{in_path}/_template.xlsx')
     template_sheets = [worksheets.title for worksheets in template_wb.worksheets]
@@ -67,7 +87,9 @@ def main():
     source_to_target(in_path, '_template.xlsx', target_wb, template_sheets)
 
     for in_file in in_files:
-        source_to_target(in_path, in_file, target_wb, template_sheets)
+        source_to_target(in_path, in_file, target_wb, template_sheets, skip_row)
+
+    add_formulas(target_wb, template_sheets, cells_with_formulas, height_final_table, skip_row)
 
     target_wb.remove(target_wb['Sheet'])
     target_wb.save(out_file)
