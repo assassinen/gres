@@ -69,7 +69,7 @@ def add_formulas(target_wb, template_sheets, cells_with_formulas, height_table, 
 
 
 def main():
-    in_files = ['tula_book.xlsx', 'orel_book.xlsx']
+    in_files = ['tula_book.xlsx', 'orel_book.xlsx', 'klin_book.xlsx']
     in_path = 'in'
     out_file = 'out/result_book.xlsx'
 
@@ -77,7 +77,7 @@ def main():
                            'C6', 'D6', 'E6', 'F6', 'G6', 'H6', 'I6', 'J6', 'K6', 'L6', 'M6', 'N6',
                            'C7', 'D7', 'E7', 'F7']
     height_table = 7
-    skip_row = 0
+    skip_row = 4
 
     template_wb = openpyxl.load_workbook(f'{in_path}/_template.xlsx')
     template_sheets = [worksheets.title for worksheets in template_wb.worksheets]
