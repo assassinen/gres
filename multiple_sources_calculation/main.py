@@ -55,27 +55,29 @@ def source_to_target(in_path, in_file, target_wb, template_sheets, skip_row=0):
                 target_sheet.merge_cells(':'.join(merge))
 
 
-def add_formulas(target_wb, template_sheets, cells_with_formulas, height_final_table, skip_row):
+def add_formulas(target_wb, template_sheets, cells_with_formulas, height_table, skip_row):
     for sheet in template_sheets:
         target_sheet = target_wb[sheet]
-        number_items = (target_sheet.max_row - skip_row) // height_final_table
+        number_items = (target_sheet.max_row - height_table) // (height_table - skip_row) + 1
         for cell in cells_with_formulas:
             cells = []
             for number_item in range(1, number_items):
-                cells += [f'{i[0]}{int(i[1:]) + number_item * height_final_table}'
+                cells += [f'{i[0]}{int(i[1:]) + number_item * (height_table - skip_row)}'
                           for i in str(cell).split(':')]
-            target_sheet[cell] = '=' + '+'.join(cells)
+            if len(cells) > 0:
+                target_sheet[cell] = '=' + '+'.join(cells)
 
 
 def main():
     in_files = ['tula_book.xlsx', 'orel_book.xlsx']
     in_path = 'in'
     out_file = 'out/result_book.xlsx'
-    skip_row = 4
+
     cells_with_formulas = ['C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5',
                            'C6', 'D6', 'E6', 'F6', 'G6', 'H6', 'I6', 'J6', 'K6', 'L6', 'M6', 'N6',
                            'C7', 'D7', 'E7', 'F7']
-    height_final_table = 3
+    height_table = 7
+    skip_row = 0
 
     template_wb = openpyxl.load_workbook(f'{in_path}/_template.xlsx')
     template_sheets = [worksheets.title for worksheets in template_wb.worksheets]
@@ -89,7 +91,7 @@ def main():
     for in_file in in_files:
         source_to_target(in_path, in_file, target_wb, template_sheets, skip_row)
 
-    add_formulas(target_wb, template_sheets, cells_with_formulas, height_final_table, skip_row)
+    add_formulas(target_wb, template_sheets, cells_with_formulas, height_table, skip_row)
 
     target_wb.remove(target_wb['Sheet'])
     target_wb.save(out_file)
