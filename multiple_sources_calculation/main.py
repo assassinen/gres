@@ -60,12 +60,12 @@ def add_formulas(target_wb, template_sheets, cells_with_formulas, height_table, 
         target_sheet = target_wb[sheet]
         number_items = (target_sheet.max_row - height_table) // (height_table - skip_row) + 1
         for cell in cells_with_formulas:
-            cells = []
+            cell_value = []
             for number_item in range(1, number_items):
-                cells += [f'{i[0]}{int(i[1:]) + number_item * (height_table - skip_row)}'
+                cell_value += [f'{i[0]}{int(i[1:]) + number_item * (height_table - skip_row)}'
                           for i in str(cell).split(':')]
-            if len(cells) > 0:
-                target_sheet[cell] = '=' + '+'.join(cells)
+            if len(cell_value) > 0:
+                target_sheet[cell] = '=' + '+'.join(cell_value)
 
 
 def main():
