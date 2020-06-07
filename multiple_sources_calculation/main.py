@@ -69,7 +69,7 @@ def add_formulas(target_wb, template_sheets, cells_with_formulas, height_table, 
 
 
 def main():
-    in_files = ['tula_book.xlsx', 'orel_book.xlsx', 'klin_book.xlsx']
+    in_files = ['tula_book.xlsx', 'klin_book.xlsx']
     in_path = 'in'
     out_file = 'out/result_book.xlsx'
 
